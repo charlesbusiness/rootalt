@@ -1,0 +1,12 @@
+{
+    "Core": true,
+    "Authentication": true,
+    "Business": true,
+    "Services": true,
+    "UserProfile": true,
+    "BusinessManager": true,
+    "AdminManager": true,
+    "Task": true,
+    "Requisition": true,
+    "Referral": true
+}

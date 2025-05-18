@@ -1,0 +1,65 @@
+##login
+
+post {{localhost}}/admin/login
+Content-Type: application/json
+Accept: application/json
+
+{
+   "loginID": "johndoe@example.com",
+   "password" : "password123"
+}
+
+#### Register admin users
+
+post   {{localhost}}/admin/register
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+   "email": "test2@example.com",
+   "password" : "Password@123",
+   "name":"Charles Oatru",
+   "admin_role_id":1,
+   "phone":"04950345930"
+}
+
+### Get Business size data
+get {{localhost}}/config/business/sizes?per_page=20
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### Get Business size data
+get {{localhost}}/config/business/categories?per_page=30&page=2
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### Create Business
+post {{localhost}}/config/business/create
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+   "business_name" :"Julius Giver",
+   "business_size_id" :1,
+   "business_category_id" :1,
+   "email" :"email@julius.com",
+   "phone" :"0919309493049"
+}
+
+
+### Get Business
+get {{localhost}}/config/business?per_page=30
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+
+### Create Business Roles
+post {{localhost}}/config/business/role
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
