@@ -111,7 +111,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function createUser(UserDto $dto)
     {
-        return $this->create([
+        $user = $this->create([
             'email' => $dto->email,
             'phone' => $dto->phone,
             'dob' => $dto->dob,
@@ -120,6 +120,12 @@ class User extends Authenticatable implements MustVerifyEmail
             'username' => $dto->username,
             'password' => Hash::make($dto->password),
         ]);
+        $referralCode = null;
+        if ($dto->referralCode) {
+
+            $referralCode = $dto->referralCode;
+        }
+        return ['user' => $user, 'code' => $referralCode];
     }
 
     public function businessRole()

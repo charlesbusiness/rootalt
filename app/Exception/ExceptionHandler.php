@@ -42,8 +42,10 @@ class ExceptionHandler extends Exception
         ];
         if ($exception instanceof ValidationException) {
             $statusCode = Response::HTTP_BAD_REQUEST;
-            $response['message'] = is_string($exception) == 'string' ? $exception : array_merge(...array_values($exception->errors()));
-            // $response['data'] = array_values( $exception->errors());
+            // $response['message'] = is_string($exception) == 'string' ? $exception : array_merge(...array_values($exception->errors()));
+            $firstError = collect($exception->errors())->flatten()->first();
+
+            $response['message'] = $firstError;
         } elseif ($exception instanceof NotFoundHttpException) {
             $statusCode = Response::HTTP_NOT_FOUND;
             $response['message'] = 'Resource not found';

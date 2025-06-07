@@ -16,6 +16,7 @@ class UserDto
     public string $lastName;
     public string $dob;
     public string $username;
+    public ?string $referralCode;
     private function __construct(
         string $email,
         string $phone,
@@ -23,7 +24,8 @@ class UserDto
         string $lastName,
         string $firstName,
         string $dob,
-        string $username
+        string $username,
+        ?string $referralCode,
     ) {
         $this->email = $email;
         $this->phone = $phone;
@@ -32,6 +34,7 @@ class UserDto
         $this->firstName = $firstName;
         $this->dob = $dob;
         $this->username = $username;
+        $this->referralCode = $referralCode ?? null;
     }
 
     public static function fromArray(array $data): self |string
@@ -39,6 +42,7 @@ class UserDto
 
         $validator = Validator::make($data, [
             'username' => ['required', 'string', 'unique:users,username'],
+            'referralCode' => ['nullable', 'string', 'exists:referral_codes,code'],
             'email' => ['required', 'email', 'unique:users,email'],
             'firstName' => ['required', 'string', 'max:100'],
             'lastName' => ['required', 'string', 'max:100'],
@@ -60,6 +64,7 @@ class UserDto
             lastName: $data['lastName'],
             dob: $data['dob'],
             username: $data['username'],
+            referralCode: @$data['referralCode'],
         );
     }
 }

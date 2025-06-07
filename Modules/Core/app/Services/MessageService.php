@@ -3,7 +3,6 @@
 namespace Modules\Core\Services;
 
 use Modules\Authentication\Jobs\AccountVerificationJob;
-use Modules\Authentication\Jobs\PhoneVerification;
 use Modules\Authentication\Jobs\PhoneVerificationJob;
 use Modules\Authentication\Models\OtpManager;
 use Modules\Core\Models\Country;

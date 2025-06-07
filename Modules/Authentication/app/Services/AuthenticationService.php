@@ -16,6 +16,7 @@ use Modules\Core\Models\BusinessRole;
 use Modules\Core\Services\ConfigurationService;
 use Modules\Core\Services\CoreService;
 use Modules\Core\Services\MessageService;
+use Modules\Referral\Jobs\ReferralCodeJob;
 use PragmaRX\Google2FALaravel\Google2FA;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Throwable;
@@ -116,7 +117,9 @@ class AuthenticationService extends CoreService
 
             DB::beginTransaction();
 
-            $user = $this->userModel->createUser($dto);
+            $userData = $this->userModel->createUser($dto);
+            $user = $userData['user'];
+            $code = $userData['code'];
 
             if ($user) {
                 $message = $this->message = "User created";
@@ -129,6 +132,8 @@ class AuthenticationService extends CoreService
 
                 $response = successfulResponse($user, $message, Response::HTTP_OK);
                 DB::commit();
+
+                ReferralCodeJob::dispatch($userData);
             } else {
                 $message = $this->message = "User was not created";
                 $response = failedResponse($user, $message, Response::HTTP_BAD_REQUEST);
@@ -154,15 +159,13 @@ class AuthenticationService extends CoreService
             $code = $this->getValidCode($validatedData);
             if ($code) {
 
-                if (is_null($this->isNotBusinessUser($code))) {
+                updateModel(
+                    column: 'email',
+                    values: $code->email,
+                    data: ['email_verified_at' => now()],
+                    model: $this->userModel
+                );
 
-                    updateModel(
-                        column: 'email',
-                        values: $code->email,
-                        data: ['email_verified_at' => now()],
-                        model: $this->userModel
-                    );
-                }
                 $message = $this->message = "Account Verified";
 
                 $response = successfulResponse($user, $message, Response::HTTP_OK);

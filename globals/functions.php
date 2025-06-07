@@ -8,6 +8,7 @@ use Modules\AdminManager\Models\Admin;
 use Modules\Authentication\Models\OtpManager;
 use Modules\Authentication\Models\TempUser;
 use Modules\Core\Models\UserType;
+use Modules\Referral\Models\ReferralCode;
 
 /**
  * This will return a standard json response when a request successful
@@ -115,6 +116,29 @@ function generateVerificationCode(): int
     }
     return $verificationCode;
 }
+
+function generateReferralCode(string $username): string
+{
+    // Take first 3 alphabetic characters (uppercase)
+    $prefix = strtoupper(substr(preg_replace('/[^a-zA-Z]/', '', $username), 0, 3));
+
+    // Fallback if username is too short or non-alphabetic
+    $prefix = str_pad($prefix, 3, 'X');
+
+    // Generate 3-digit random number
+    $randomDigits = mt_rand(100, 999);
+
+    $code = $prefix . $randomDigits;
+
+    // Check uniqueness
+    if (ReferralCode::where('code', $code)->exists()) {
+        // Retry recursively
+        return generateReferralCode($username);
+    }
+
+    return $code;
+}
+
 
 
 /**
