@@ -38,10 +38,12 @@ class AppConfiguration extends Command
     {
         try {
             $this->info("Starting app configuration");
-            // $this->configService->createRoles();
+            $this->configService->createRoles();
             // $this->configService->createIndustries();
             $this->configService->createCountries();
             $this->configService->createCounties();
+            $this->configService->createCommissionLevel();
+            $this->configService->createDefaultAdminUser();
             $this->info("App configuration completed");
         } catch (Throwable $th) {
             logError($th);

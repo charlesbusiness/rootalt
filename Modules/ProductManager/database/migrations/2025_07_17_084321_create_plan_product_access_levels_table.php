@@ -11,13 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('uploads', function (Blueprint $table) {
+        Schema::create('plan_product_access_levels', function (Blueprint $table) {
             $table->id();
-            $table->string('upload_type');
-            $table->string('upload_path');
-            $table->string('file_size')->nullable();
-            $table->string('file_name')->nullable();
-            $table->foreignId('entity_id');
+            $table->foreignId('product_plan_id');
+            $table->foreignId('product_id');
             $table->timestamps();
         });
     }
@@ -27,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('uploads');
+        Schema::dropIfExists('plan_product_access_levels');
     }
 };

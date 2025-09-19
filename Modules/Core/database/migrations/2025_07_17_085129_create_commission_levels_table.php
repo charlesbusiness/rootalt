@@ -11,13 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('uploads', function (Blueprint $table) {
+        Schema::create('commission_levels', function (Blueprint $table) {
             $table->id();
-            $table->string('upload_type');
-            $table->string('upload_path');
-            $table->string('file_size')->nullable();
-            $table->string('file_name')->nullable();
-            $table->foreignId('entity_id');
+            $table->string('level');
             $table->timestamps();
         });
     }
@@ -27,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('uploads');
+        Schema::dropIfExists('commission_levels');
     }
 };

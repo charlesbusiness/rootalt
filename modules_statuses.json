@@ -8,5 +8,6 @@
     "AdminManager": true,
     "Task": true,
     "Requisition": true,
-    "Referral": true
+    "Referral": true,
+    "ProductManager": true
 }

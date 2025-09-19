@@ -11,13 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('uploads', function (Blueprint $table) {
+        Schema::create('order_managers', function (Blueprint $table) {
             $table->id();
-            $table->string('upload_type');
-            $table->string('upload_path');
-            $table->string('file_size')->nullable();
-            $table->string('file_name')->nullable();
-            $table->foreignId('entity_id');
+            $table->foreignId('product_id');
+            $table->foreignId('user_id');
+            $table->string('quantity');
             $table->timestamps();
         });
     }
@@ -27,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('uploads');
+        Schema::dropIfExists('order_managers');
     }
 };

@@ -1,0 +1,11 @@
+{
+    "name": "ProductManager",
+    "alias": "productmanager",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\ProductManager\\Providers\\ProductManagerServiceProvider"
+    ],
+    "files": []
+}

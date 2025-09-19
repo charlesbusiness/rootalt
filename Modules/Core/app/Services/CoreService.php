@@ -36,12 +36,45 @@ class CoreService extends Constant
 
         $file = $request->file($filename);
         $filePath = $location;
-        $fileName = time();
+        $fileSize = $file->getSize();
+        $fileOriginalName = $file->getClientOriginalName(); // Correct method
+        $extension = $file->getClientOriginalExtension();
+        $fileName = time() . '.' . $extension;
         $file->move(public_path($filePath), $fileName);
         $fullPath = config('core.app_url') . "/$filePath/$fileName";
 
+        return [
+            'url' => $fullPath,
+            'size' => round($fileSize / 1024, 2) . 'kb',
+            'fileName' => $fileOriginalName
+        ];
         return $fullPath;
         //   return asset($filePath . '/' . $fileName);
+    }
+
+    protected function uploadMultipleFiles($request, $filename = 'file',  $location = 'uploads')
+    {
+        $files = $request->file($filename);
+        $paths = [];
+        $filePath = $location;
+
+
+        foreach ($files as $file) {
+            $fileSize = $file->getSize();
+            $fileOriginalName = $file->getClientOriginalName();
+            // $extension = $file->getClientOriginalExtension();
+
+            $fileName = time() . $fileOriginalName;
+            $file->move(public_path($filePath), $fileName);
+            $fullPath = config('core.app_url') . "/$filePath/$fileName";
+            $paths[] = [
+
+                'url' => $fullPath,
+                'size' => round($fileSize / 1024, 2) . 'kb',
+                'fileName' => $fileOriginalName
+            ];
+        }
+        return $paths;
     }
 
 
@@ -67,7 +100,7 @@ class CoreService extends Constant
     /** 
      * Generate a token for all devices.
      */
-    protected function generateToken(string $email = null, Model $model = null, $user = null)
+    protected function generateToken($email = null, Model $model = null, $user = null)
     {
         // Retrieve the user if not provided
         $user = $user ?? $model::query()->where('email', $email)->first();
@@ -78,6 +111,7 @@ class CoreService extends Constant
 
         // Create a personal access token for the user
         $token = $user->createToken(config('authentication.access_token'));
+
 
         // Assign token details to the user
         $tokenExpiration = $token->accessToken->expire_at ?? now()->addHours(5);
@@ -191,6 +225,17 @@ class CoreService extends Constant
 
         $res = $result ? 'File deleted successfully' : 'Failed to delete file';
         logData($res);
+    }
+
+    public function deleteFiles($path)
+    {
+
+        // Convert the URL path to a local file path
+        $oldFilePath = public_path(parse_url($path, PHP_URL_PATH));
+        // Check if the file exists, then delete it
+        if (file_exists($oldFilePath)) {
+            unlink($oldFilePath);
+        }
     }
 
     protected function createOrUpdateMultiple(array $records, Model $model, array $uniqueKeys)

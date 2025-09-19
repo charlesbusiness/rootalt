@@ -57,7 +57,6 @@ class AuthenticationService extends CoreService
 
             $user = user($request->email ?? $request->username);
 
-
             if (!$user || !Hash::check($credentials['password'], $user->password)) {
                 return failedResponse(null, "Invalid login credentials", Response::HTTP_BAD_REQUEST);
             }
@@ -69,6 +68,7 @@ class AuthenticationService extends CoreService
                 return successfulResponse($codeData, $this->message);
             }
 
+            // dd($user);
             $token = $this->generateToken(
                 user: $user
             );
@@ -119,7 +119,6 @@ class AuthenticationService extends CoreService
 
             $userData = $this->userModel->createUser($dto);
             $user = $userData['user'];
-            $code = $userData['code'];
 
             if ($user) {
                 $message = $this->message = "User created";

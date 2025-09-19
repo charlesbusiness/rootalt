@@ -90,6 +90,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     protected $appends = ['user_role',];
 
+    public $roles = ['ADMIN' => 'admin', 'USER' => 'users'];
 
     /**
      * Accessor for appended 'role' attribute.
@@ -108,12 +109,19 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->country;
     }
+    public function getRoles($roleName)
+    {
+        return Role::query()
+            ->where('name', $roleName)
+            ->first();
+    }
 
     public function createUser(UserDto $dto)
     {
         $user = $this->create([
             'email' => $dto->email,
             'phone' => $dto->phone,
+            'role_id' => $this->getRoles($this->roles['USER'])->id,
             'dob' => $dto->dob,
             'firstName' => $dto->firstName,
             'lastName' => $dto->lastName,
@@ -131,90 +139,5 @@ class User extends Authenticatable implements MustVerifyEmail
     public function businessRole()
     {
         return $this->belongsToMany(BusinessRole::class, 'business_role_users');
-    }
-
-    // Accessor to get all permissions from all roles as a collection of permission names.
-    public function getAllPermissionsAttribute()
-    {
-        return $this->businessRole()
-            ->with('permissions.resource')
-            ->get()
-            ->pluck('permissions')
-            ->flatten()
-            ->unique(function ($permission) {
-                return $permission->id;
-            });
-    }
-
-
-
-
-    public function businessRoles()
-    {
-        return $this->belongsToMany(BusinessRole::class, 'business_role_users');
-    }
-
-
-    public function hasSuperAccessToResource()
-    {
-        if ($this->businessRoles->contains(function ($role) {
-            return $role->name === CoreService::MAIN_BUSINESS_ADMIN && is_null($role->business_id);
-        })) {
-            return true;
-        }
-    }
-
-
-    public function hasAccessToResource($resourceId, $businessId)
-    {
-        // Check if the user has the global 'admin-user' role
-        $resourceIds = $this->businessRoles
-            ->flatMap(function ($role) use ($businessId) {
-                return $role->businessRolePermissions
-                    ->when($businessId, function ($query, $businessId) {
-                        return $query->where('business_id', $businessId);
-                    })
-                    ->pluck('resource_id');
-            })->unique();
-
-        return $resourceIds->contains($resourceId);
-    }
-
-    public function hasAccessToResource2($resourceId, $businessId = null)
-    {
-        // Check if the user has the global 'admin-user' role
-        if ($this->businessRoles->contains(function ($role) {
-            return $role->name === CoreService::MAIN_BUSINESS_ADMIN && is_null($role->business_id);
-        })) {
-            return true;
-        }
-
-        $resourceIds = $this->businessRoles
-            ->flatMap(function ($role) use ($businessId) {
-                // Optionally filter by business if needed
-                return $role->businessRolePermissions
-                    ->when($businessId, function ($query, $businessId) {
-                        return $query->where('business_id', $businessId);
-                    })
-                    ->pluck('resource_id');
-            })->unique();
-
-        return $resourceIds->contains($resourceId);
-    }
-
-
-    public function businessRoleUsers()
-    {
-        return $this->hasMany(BusinessRoleUser::class);
-    }
-
-    public function rolesInBusiness($businessId)
-    {
-        info("Business role user data", [$this->businessRoleUsers()]);
-        return $this->businessRoleUsers()
-            ->where('business_id', $businessId)
-            ->with('businessRole:id,name,business_id')
-            ->get()
-            ->pluck('businessRole');
     }
 }
