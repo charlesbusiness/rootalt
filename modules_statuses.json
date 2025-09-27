@@ -9,5 +9,6 @@
     "Task": true,
     "Requisition": true,
     "Referral": true,
-    "ProductManager": true
+    "ProductManager": true,
+    "OrderManagement": true
 }

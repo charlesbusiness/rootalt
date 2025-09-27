@@ -14,28 +14,29 @@ use Modules\ProductManager\Http\Requests\UpdateProductCategoryRequest;
 use Modules\ProductManager\Http\Requests\UpdateProductRequest;
 use Modules\ProductManager\Models\Product;
 use Modules\ProductManager\Models\ProductCategory;
+use Modules\ProductManager\Models\ProductMovement;
 use Throwable;
 
 class ProductManagerService extends CoreService
 {
     protected $productModel;
     protected $productCatModel;
-    protected $auth;
     protected $user;
-    protected $configService;
-    protected $buznessRole;
     protected $upload;
+    protected $productMovementModel;
 
     public function __construct(
         User $user,
         Product $product,
         Upload $upload,
         ProductCategory $productCatModel,
+        ProductMovement $productMovementModel
     ) {
         $this->productCatModel = $productCatModel;
         $this->productModel = $product;
         $this->user = $user;
         $this->upload = $upload;
+        $this->productMovementModel = $productMovementModel;
         parent::__construct();
     }
 
@@ -114,7 +115,7 @@ class ProductManagerService extends CoreService
             unset($data['product_photo']);
 
             $createdData = $this->productModel->updateOrCreate(
-                ['product_name' => $data['product_name']],
+                ['product_sku' => $data['product_sku']],
                 $data
             );
 
@@ -141,21 +142,42 @@ class ProductManagerService extends CoreService
         }
     }
 
+
     /** **
-     * Allow admin to update product categories
+     * Allow admin to update product
      ** */
+
+
     public function updateProduct(UpdateProductRequest $request)
     {
+        DB::beginTransaction();
         try {
             $data = $request->validated();
+
             $product = $this->productModel->query()
                 ->where('id', $data['id'])
-                ->first();
+                ->lockForUpdate()
+                ->firstOrFail();
 
-            $product->update($data);
+            $movement = $this->productMovementModel->makeMovement(
+                $product,
+                $data['movement_type'],
+                (int) $data['product_qty'],
+                $data['reason'] ?? 'Manual adjustment'
+            );
 
+            // Apply stock change
+            if ($movement->transaction_type === 'inbound') {
+                $product->increment('product_qty', $movement->qty);
+            } else {
+                if ($product->product_qty < $movement->qty) {
+                    return failedResponse($product, 'Trying to reduce more than available stock', 422);
+                }
+                $product->decrement('product_qty', $movement->qty);
+            }
+
+            // Handle product photos
             if ($request->hasFile('product_photo')) {
-
                 $associatedUpload = $this->upload
                     ->query()
                     ->where('entity_id', $product->id)
@@ -167,9 +189,7 @@ class ProductManagerService extends CoreService
                     $uploadedFile->delete();
                 }
 
-
                 $uploadData = $this->uploadMultipleFiles($request, 'product_photo');
-
                 foreach ($uploadData as $upload) {
                     $this->upload->create([
                         'upload_path' => $upload['url'],
@@ -180,16 +200,17 @@ class ProductManagerService extends CoreService
                     ]);
                 }
             }
+
+            DB::commit();
             $product->refresh();
             $this->message = "Product updated";
             return successfulResponse($product, $this->message);
         } catch (Throwable $e) {
-
+            DB::rollBack();
             logError($e);
             return failedResponse(null, $this->errorMessage);
         }
     }
-
 
     public function products(Request $request)
     {

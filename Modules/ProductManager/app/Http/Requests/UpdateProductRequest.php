@@ -22,6 +22,7 @@ class UpdateProductRequest extends FormRequest
             'product_retail_price' => ['sometimes', 'filled', 'numeric'],
             'product_memory_price' => ['sometimes', 'filled', 'numeric'],
             'product_qty' => ['sometimes', 'filled', 'numeric'],
+            'movement_ype' => ['required',  'string', 'in:inbound,outbound'],
         ];
     }
 
@@ -30,6 +31,10 @@ class UpdateProductRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return Auth::user()?->role?->name === 'admin';
+
+        if (Auth::user()->role->name === 'admin') {
+            return true;
+        }
+        return false;
     }
 }
