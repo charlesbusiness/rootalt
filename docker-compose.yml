@@ -1,9 +1,9 @@
 services:
-    erp:
+    rootalt:
         build:
             context: .
             dockerfile: ./docker/Dockerfile
-        container_name: erp
+        container_name: rootalt
         restart: unless-stopped
         entrypoint:
             - "/bin/bash"
@@ -11,15 +11,15 @@ services:
         volumes:
             - ./:/var/www/html
         expose:
-           - "9000"
+            - "9000"
         networks:
             - network
         depends_on:
-            - erp_db
+            - rootalt_db
 
-    erp_nginx:
+    rootalt_nginx:
         image: nginx:latest
-        container_name: erp_nginx
+        container_name: rootalt_nginx
         restart: unless-stopped
         volumes:
             - ./:/var/www/html/
@@ -32,12 +32,11 @@ services:
         networks:
             - network
         depends_on:
-            - erp
-          
+            - rootalt
 
-    erp_db:
+    rootalt_db:
         image: mariadb:10.5
-        container_name: erp_db
+        container_name: rootalt_db
         restart: unless-stopped
         environment:
             MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
@@ -48,7 +47,7 @@ services:
             max_connections: 50
             query_cache_size: 16M
         volumes:
-            - erp_data:/var/lib/mysql
+            - rootalt_data:/var/lib/mysql
         ports:
             - "3306:3306"
         networks:
@@ -59,4 +58,4 @@ networks:
         driver: bridge
 
 volumes:
-    erp_data:
+    rootalt_data:
