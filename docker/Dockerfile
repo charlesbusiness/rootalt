@@ -26,16 +26,18 @@ RUN composer config --global process-timeout 2000
 # Clean up
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Set the working directory in the container
+# Set the working directory
 WORKDIR /var/www/html
 
-# Copy the application code (including storage and bootstrap/cache folders)
+# Copy application code
 COPY . /var/www/html
 
-# Ensure storage and cache directories exist and set permissions
-RUN mkdir -p /var/www/html/storage /var/www/html/bootstrap/cache && \
-    chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache && \
-    chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+# Fix permissions AFTER code copy
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
+    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+
+# Switch to www-data (for runtime safety)
+USER www-data
 
 # Expose port 9000
 EXPOSE 9000
