@@ -25,8 +25,8 @@ services:
         restart: unless-stopped
         volumes:
             - ./:/var/www/html/
-            - ./docker/nginx.conf:/etc/nginx/conf.d/default.conf
-            - ./certs/live/rootatl.otarucharles.live-0001:/etc/letsencrypt/live/rootatl.otarucharles.live-0001:ro
+            - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+            - ./certs:/etc/letsencrypt:ro
 
             - ./logs/nginx:/var/log/nginx
         environment:
