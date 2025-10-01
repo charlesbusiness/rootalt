@@ -1,7 +1,4 @@
-version: "3.9"
-
 services:
-    # Laravel/PHP-FPM container
     rootatl:
         build:
             context: .
@@ -14,6 +11,7 @@ services:
         volumes:
             - ./:/var/www/html
             - ./logs/php:/var/log
+
         expose:
             - "9000"
         networks:
@@ -21,7 +19,6 @@ services:
         depends_on:
             - rootatl_db
 
-    # Nginx container
     rootatl_nginx:
         image: nginx:latest
         container_name: rootatl_nginx
@@ -29,20 +26,21 @@ services:
         volumes:
             - ./:/var/www/html/
             - ./docker/nginx.conf:/etc/nginx/conf.d/default.conf
-            - certs:/etc/letsencrypt
             - ./logs/nginx:/var/log/nginx
+            - certs:/etc/letsencrypt
+
         environment:
             - NGINX_ERROR_LOG=/var/log/nginx/error.log
             - NGINX_ACCESS_LOG=/var/log/nginx/access.log
         ports:
             - "80:80"
             - "443:443"
+
         networks:
             - network
         depends_on:
             - rootatl
 
-    # MariaDB container
     rootatl_db:
         image: mariadb:10.5
         container_name: rootatl_db
@@ -61,18 +59,19 @@ services:
             - "3306:3306"
         networks:
             - network
-
-    # Certbot container for initial certificate issuance and renewals
     certbot:
         image: certbot/certbot
         container_name: certbot
-        depends_on:
-            - rootatl_nginx
         volumes:
             - certs:/etc/letsencrypt
             - ./docker/nginx.conf:/etc/nginx/conf.d/default.conf
-            - ./:/var/www/html
-        entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done'"
+        entrypoint: >
+            sh -c "certbot certonly --webroot --webroot-path=/var/www/html
+                --email you@domain.com
+                --agree-tos
+                --no-eff-email
+                -d yourdomain.com
+                -d www.yourdomain.com"
 
 networks:
     network:
