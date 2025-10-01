@@ -108,7 +108,7 @@ class ExceptionHandler extends Exception
     public function defaultExceptionHandler(Throwable $exception)
     {
         // Generate an appropriate response for non-JSON requests
-        logError($exception);
+        // logError($exception);
         $statusCode = $exception instanceof HttpException
             ? $exception->getStatusCode()
             : 500;
