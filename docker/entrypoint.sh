@@ -5,6 +5,8 @@ php artisan migrate --force
 php artisan optimize
 php artisan app:config
 
+
+
 # Define an array of log file paths
 log_files=(
     "/var/log/supervisord.log"
