@@ -37,20 +37,5 @@ jobs:
             echo "---- DB Logs ----"
             docker logs --tail=100 rootatl_db || true
           EOF
-      - name: Deploy to Droplet
-        run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.DO_USER }}@${{ secrets.DO_HOST }} << 'EOF'
-            cd /var/www/rootalt
-            git pull origin main
-
-            # Restore SSL certs
-            mkdir -p certs/live/rootatl.otarucharles.live-0001
-            echo "${{ secrets.SSL_CERT }}" | base64 -d > certs/live/rootatl.otarucharles.live-0001/fullchain.pem
-            echo "${{ secrets.SSL_KEY }}" | base64 -d > certs/live/rootatl.otarucharles.live-0001/privkey.pem
-
-            # Restart Docker
-            docker compose down
-            docker compose up -d --build
-          EOF
-
+          
 
