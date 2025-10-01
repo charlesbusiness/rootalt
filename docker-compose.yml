@@ -24,7 +24,7 @@ services:
         restart: unless-stopped
         volumes:
             - ./:/var/www/html
-            - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro # ✅ correct file mount
+            - ./docker/nginx.conf:/etc/nginx/conf.d/default.conf
             - ./certs:/etc/letsencrypt:ro # ✅ mount full certs directory
             - ./logs/nginx:/var/log/nginx
         environment:
