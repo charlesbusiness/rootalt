@@ -8,6 +8,8 @@ php artisan app:config
 
 
 # Define an array of log file paths
+mkdir -p /var/log
+chmod -R 777 /var/log
 log_files=(
     "/var/log/supervisord.log"
     "/var/log/nginx-error.log"
