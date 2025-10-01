@@ -1,5 +1,4 @@
 services:
-    # Laravel/PHP-FPM container
     rootatl:
         build:
             context: .
@@ -27,7 +26,7 @@ services:
         volumes:
             - ./:/var/www/html/
             - ./docker/nginx.conf:/etc/nginx/conf.d/default.conf
-            - certs:/etc/letsencrypt
+            - ./certs:/etc/letsencrypt # 👈 use bind mount
             - ./logs/nginx:/var/log/nginx
         environment:
             - NGINX_ERROR_LOG=/var/log/nginx/error.log
@@ -67,7 +66,7 @@ services:
         depends_on:
             - rootatl_nginx
         volumes:
-            - certs:/etc/letsencrypt
+            - ./certs:/etc/letsencrypt # 👈 same here
             - ./:/var/www/html
         entrypoint: >
             /bin/sh -c "trap exit TERM;
@@ -83,4 +82,3 @@ networks:
 
 volumes:
     rootatl_data:
-    certs:
