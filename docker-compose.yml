@@ -1,9 +1,9 @@
 services:
-    rootalt:
+    rootatl:
         build:
             context: .
             dockerfile: ./docker/Dockerfile
-        container_name: rootalt
+        container_name: rootatl
         restart: unless-stopped
         entrypoint:
             - "/bin/bash"
@@ -15,11 +15,11 @@ services:
         networks:
             - network
         depends_on:
-            - rootalt_db
+            - rootatl_db
 
-    rootalt_nginx:
+    rootatl_nginx:
         image: nginx:latest
-        container_name: rootalt_nginx
+        container_name: rootatl_nginx
         restart: unless-stopped
         volumes:
             - ./:/var/www/html/
@@ -28,15 +28,17 @@ services:
             - NGINX_ERROR_LOG=/var/log/nginx/error.log
             - NGINX_ACCESS_LOG=/var/log/nginx/access.log
         ports:
-            - "9000:80"
+            - "80:80"
+            - "443:443"
+
         networks:
             - network
         depends_on:
-            - rootalt
+            - rootatl
 
-    rootalt_db:
+    rootatl_db:
         image: mariadb:10.5
-        container_name: rootalt_db
+        container_name: rootatl_db
         restart: unless-stopped
         environment:
             MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
@@ -47,7 +49,7 @@ services:
             max_connections: 50
             query_cache_size: 16M
         volumes:
-            - rootalt_data:/var/lib/mysql
+            - rootatl_data:/var/lib/mysql
         ports:
             - "3306:3306"
         networks:
@@ -58,4 +60,4 @@ networks:
         driver: bridge
 
 volumes:
-    rootalt_data:
+    rootatl_data:
