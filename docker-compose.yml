@@ -10,6 +10,8 @@ services:
             - "./docker/entrypoint.sh"
         volumes:
             - ./:/var/www/html
+            - ./logs/php:/var/log # PHP + Supervisor + Laravel logs
+
         expose:
             - "9000"
         networks:
@@ -24,6 +26,8 @@ services:
         volumes:
             - ./:/var/www/html/
             - ./docker/nginx.conf:/etc/nginx/conf.d/default.conf
+            - ./logs/nginx:/var/log/nginx # Nginx logs
+
         environment:
             - NGINX_ERROR_LOG=/var/log/nginx/error.log
             - NGINX_ACCESS_LOG=/var/log/nginx/access.log
