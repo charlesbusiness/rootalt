@@ -30,11 +30,11 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.DO_USER }}@${{ secrets.DO_HOST }} << 'EOF'
             docker ps -a
-            echo "---- Rootalt Logs ----"
-            docker logs --tail=100 rootalt || true
+            echo "---- Rootatl Logs ----"
+            docker logs --tail=100 rootatl || true
             echo "---- Nginx Logs ----"
-            docker logs --tail=100 rootalt_nginx || true
+            docker logs --tail=100 rootatl_nginx || true
             echo "---- DB Logs ----"
-            docker logs --tail=100 rootalt_db || true
+            docker logs --tail=100 rootatl_db || true
           EOF
 
