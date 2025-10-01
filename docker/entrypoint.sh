@@ -26,6 +26,10 @@ for log_file in "${log_files[@]}"; do
     chmod 666 "$log_file"
 done
 
+today=$(date +%F)
+ln -sf /var/www/html/storage/logs/laravel-$today.log /var/log/laravel.log
+
+
 # Ensure Laravel log directory exists
 mkdir -p /var/www/html/storage/logs
 
