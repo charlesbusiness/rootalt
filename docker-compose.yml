@@ -18,16 +18,14 @@ services:
         depends_on:
             - rootatl_db
 
-    # Nginx container
     rootatl_nginx:
         image: nginx:latest
         container_name: rootatl_nginx
         restart: unless-stopped
         volumes:
-            - ./:/var/www/html/
-            - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
-            - ./certs:/etc/letsencrypt:ro
-
+            - ./:/var/www/html
+            - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro # ✅ correct file mount
+            - ./certs:/etc/letsencrypt:ro # ✅ mount full certs directory
             - ./logs/nginx:/var/log/nginx
         environment:
             - NGINX_ERROR_LOG=/var/log/nginx/error.log
@@ -40,7 +38,6 @@ services:
         depends_on:
             - rootatl
 
-    # MariaDB container
     rootatl_db:
         image: mariadb:10.5
         container_name: rootatl_db
@@ -60,14 +57,13 @@ services:
         networks:
             - network
 
-    # Certbot container
     certbot:
         image: certbot/certbot
         container_name: certbot
         depends_on:
             - rootatl_nginx
         volumes:
-            - ./certs/live/rootatl.otarucharles.live-0001:/etc/letsencrypt/live/rootatl.otarucharles.live-0001:ro
+            - ./certs:/etc/letsencrypt # ✅ mount entire certs dir
             - ./:/var/www/html
         entrypoint: >
             /bin/sh -c "trap exit TERM;
