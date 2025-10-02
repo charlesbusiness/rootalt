@@ -9,7 +9,7 @@ services:
             - "/bin/bash"
             - "./docker/entrypoint.sh"
         volumes:
-            - ./:/var/www/html
+            - /var/www/rootalt:/var/www/html
             - ./logs/php:/var/log
         ports:
             - "9000:9000" # publish PHP-FPM so host nginx can connect
