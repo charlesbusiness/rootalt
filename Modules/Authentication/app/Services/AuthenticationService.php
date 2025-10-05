@@ -8,6 +8,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Modules\Authentication\Dto\UserDto;
 use Modules\Authentication\Http\Requests\ResendEmailVeificationRequest;
 use Modules\Authentication\Http\Requests\VerifyEmailRequest;
@@ -56,7 +57,7 @@ class AuthenticationService extends CoreService
             $token = null;
 
             $user = user($request->email ?? $request->username);
-            info("Logged in user data==================", $user);
+            logData($user);
             if (!$user || !Hash::check($credentials['password'], $user->password)) {
                 return failedResponse(null, "Invalid login credentials", Response::HTTP_BAD_REQUEST);
             }
