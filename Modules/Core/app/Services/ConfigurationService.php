@@ -57,7 +57,21 @@ class ConfigurationService extends CoreService
 
     public function createDefaultAdminUser()
     {
+        info(
+            "Admin data",
+            [
+                'email' => $this->adminEmail,
+                'phone' => $this->adminPhone,
+                'role_id' => $this->user->getRoles($this->user->roles['ADMIN'])->id,
+                'dob' => now()->subYears(30),
+                'email_verified_at' => now(),
+                'firstName' => $this->adminFirstName,
+                'lastName' => $this->adminLastName,
+                'username' => $this->adminUserName,
+                'password' => Hash::make($this->adminPassword),
+            ]
 
+        );
         return  $this->user->updateOrCreate(
             ['email' => $this->adminEmail],
             [
