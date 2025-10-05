@@ -86,7 +86,7 @@ class OrderManagementService extends CoreService
             }
 
             // 3. Tax/shipping
-            $tax          = $subtotal * 0.08; // Example: 8%
+            $tax          = $subtotal * 0.09; // Example: 8%
             $shippingCost = 10.00;
             $grandTotal   = $subtotal + $tax + $shippingCost;
 
