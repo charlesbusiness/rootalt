@@ -56,7 +56,7 @@ class AuthenticationService extends CoreService
             $token = null;
 
             $user = user($request->email ?? $request->username);
-
+            info("Logged in user data==================", $user);
             if (!$user || !Hash::check($credentials['password'], $user->password)) {
                 return failedResponse(null, "Invalid login credentials", Response::HTTP_BAD_REQUEST);
             }
