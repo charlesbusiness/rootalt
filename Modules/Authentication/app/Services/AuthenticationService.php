@@ -59,7 +59,7 @@ class AuthenticationService extends CoreService
             $user = user($request->email ?? $request->username);
             logData($user);
             if (!$user || !Hash::check($credentials['password'], $user->password)) {
-                return failedResponse(null, "Invalid login credentials", Response::HTTP_BAD_REQUEST);
+                return failedResponse(null, "Invalid login credentials provided", Response::HTTP_BAD_REQUEST);
             }
 
             // Check if user has 2FA enabled
